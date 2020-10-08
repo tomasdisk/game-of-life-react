@@ -3,55 +3,6 @@ const COLS = Math.floor(document.documentElement.clientWidth / resolution) - 1;
 const ROWS = Math.floor(document.documentElement.clientHeight / resolution) - 5;
 let grid: number[];
 
-// interface ICell {
-//   alive: boolean
-//   color: p5.Color
-//   age: number
-// }
-
-// // type Grid = ICell[][]
-
-// class Grid<T> {
-//   grid: T[][]
-//   width: number
-//   height: number
-//   constructor(cols: number, rows: number, initializer: (cols: number, rows: number, x: number, y: number) => T) {
-//     if (cols <= 0 && rows <= 0) {
-//       throw new Error('Number of cols and rows must be intiger greater than zero.')
-//     }
-//     this.width = cols
-//     this.height = rows
-//     for (let x = 0; x < cols; x++) {
-//       this.grid[x] = []
-//       for (let y = 0; y < rows; y++) {
-//         this.grid[x][y] = initializer(cols, rows, x, y)
-//       }
-//     }
-//   }
-
-//   set(x: number, y: number, value: T) {
-//     this.grid[x][y] = value
-//   }
-
-//   safeSet(x: number, y: number, value: T) {
-//     if (x < 0 || x >= this.width || y < 0 || y > this.height) {
-//       return
-//     }
-//     this.grid[x][y] = value
-//   }
-
-//   get(x: number, y: number) {
-//     return this.grid[x][y]
-//   }
-
-//   safeGet(x: number, y: number) {
-//     if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-//       return
-//     }
-//     return this.grid[x][y]
-//   }
-// }
-
 const eraser = (grid: number[], x: number, y: number, h = 1) => {
   for (let i = x; i < x + h; i++) {
     for (let j = y; j < y + h; j++) {
