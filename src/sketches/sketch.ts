@@ -1,3 +1,10 @@
+interface ISketchProps {
+  sketch: any;
+  color: number;
+  random: boolean;
+  running: boolean;
+}
+
 let resolution = 20;
 const COLS = Math.floor(document.documentElement.clientWidth / resolution) - 1;
 const ROWS = Math.floor(document.documentElement.clientHeight / resolution) - 5;
@@ -6,15 +13,17 @@ let grid: number[];
 const eraser = (grid: number[], x: number, y: number, h = 1) => {
   for (let i = x; i < x + h; i++) {
     for (let j = y; j < y + h; j++) {
-      grid[i * COLS + j] = 0;
+      // grid[i * COLS + j] = 0;
+      clearBlock(grid, i, j);
     }
   }
 };
 
-const drawer = (grid: number[], x: number, y: number, h = 1) => {
-  for (let i = x; i < x + h; i++) {
-    for (let j = y; j < y + h; j++) {
-      grid[i * COLS + j] = 1;
+const drawer = (grid: number[], x: number, y: number, radius = 1) => {
+  const r = Math.floor(radius / 2);
+  for (let i = x - r; i <= x + r; i++) {
+    for (let j = y - r; j <= y + r; j++) {
+      paintBlock(grid, i, j);
     }
   }
 };
@@ -54,11 +63,16 @@ const makeGilder = (
   grid[(xx + 2) * COLS * xDir + yy + 2 * yDir] = 1;
 };
 
-const makeBlock = (grid: number[][], x: number, y: number) => {
-  grid[x][y] = 1;
-  grid[x + 1][y] = 1;
-  grid[x + 1][y + 1] = 1;
-  grid[x][y + 1] = 1;
+const toggleBlock = (grid: number[], x: number, y: number) => {
+  grid[x * COLS + y] = grid[x * COLS + y] === 0 ? 1 : 0;
+};
+
+const paintBlock = (grid: number[], x: number, y: number) => {
+  grid[x * COLS + y] = 1;
+};
+
+const clearBlock = (grid: number[], x: number, y: number) => {
+  grid[x * COLS + y] = 1;
 };
 
 export const clear = () => {
@@ -128,7 +142,8 @@ const sketch = (p: any) => {
       }
     }
   };
-  p.myCustomRedrawAccordingToNewPropsHandler = (props: any) => {
+
+  p.myCustomRedrawAccordingToNewPropsHandler = (props: ISketchProps) => {
     color = props.color;
     rand = props.random;
     running = props.running;
@@ -161,7 +176,8 @@ const sketch = (p: any) => {
     const y = p.floor(p.mouseY / resolution);
     console.log(x, y);
     if (x >= 0 && y >= 0 && x < COLS && y < ROWS) {
-      drawer(grid, x, y, 1);
+      console.log("drawer", grid, x, y, 1);
+      drawer(grid, x, y, 2);
       // eraser(grid, x + 3, y + 3, 5);
       // makeGilder(grid, x, y, 1, true);
     }
