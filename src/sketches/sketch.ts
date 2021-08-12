@@ -1,3 +1,5 @@
+import p5 from "p5";
+
 interface ISketchProps {
   sketch: any;
   color: number;
@@ -5,15 +7,28 @@ interface ISketchProps {
   running: boolean;
 }
 
+type IP5js = {
+  myCustomRedrawAccordingToNewPropsHandler: (props: ISketchProps) => void;
+} & p5;
+
 let resolution = 20;
-const COLS = Math.floor(document.documentElement.clientWidth / resolution) - 1;
-const ROWS = Math.floor(document.documentElement.clientHeight / resolution) - 5;
 let grid: number[];
+const size = {
+  x: Math.floor(window.innerWidth / resolution) - 1,
+  y: Math.floor(window.innerHeight / resolution) - 5,
+};
+console.log(size);
+
+// window.addEventListener("resize", () => {
+//   console.log("wa")
+//   size.x = Math.floor(window.innerWidth / resolution) - 1;
+//   size.y = Math.floor(window.innerHeight / resolution) - 5;
+
+// });
 
 const eraser = (grid: number[], x: number, y: number, h = 1) => {
   for (let i = x; i < x + h; i++) {
     for (let j = y; j < y + h; j++) {
-      // grid[i * COLS + j] = 0;
       clearBlock(grid, i, j);
     }
   }
@@ -56,23 +71,23 @@ const makeGilder = (
     xx = x + 2;
     yy = y + 2;
   }
-  grid[(xx + 1) * COLS * xDir + yy] = 1;
-  grid[(xx + 2) * COLS * xDir + yy + 1 * yDir] = 1;
-  grid[xx * COLS + yy + 2 * yDir] = 1;
-  grid[(xx + 1) * COLS * xDir + yy + 2 * yDir] = 1;
-  grid[(xx + 2) * COLS * xDir + yy + 2 * yDir] = 1;
+  grid[(xx + 1) * size.x * xDir + yy] = 1;
+  grid[(xx + 2) * size.x * xDir + yy + 1 * yDir] = 1;
+  grid[xx * size.x + yy + 2 * yDir] = 1;
+  grid[(xx + 1) * size.x * xDir + yy + 2 * yDir] = 1;
+  grid[(xx + 2) * size.x * xDir + yy + 2 * yDir] = 1;
 };
 
 const toggleBlock = (grid: number[], x: number, y: number) => {
-  grid[x * COLS + y] = grid[x * COLS + y] === 0 ? 1 : 0;
+  grid[x * size.x + y] = grid[x * size.x + y] === 0 ? 1 : 0;
 };
 
 const paintBlock = (grid: number[], x: number, y: number) => {
-  grid[x * COLS + y] = 1;
+  grid[x * size.x + y] = 1;
 };
 
 const clearBlock = (grid: number[], x: number, y: number) => {
-  grid[x * COLS + y] = 1;
+  grid[x * size.x + y] = 1;
 };
 
 export const clear = () => {
@@ -81,10 +96,24 @@ export const clear = () => {
   }
 };
 
-const sketch = (p: any) => {
+const makeGrid = (
+  cols: number,
+  rows: number,
+  initializer?: (cols: number, rows: number, x: number, y: number) => number
+) => {
+  const a: number[] = [];
+  for (let x = 0; x < cols; x++) {
+    for (let y = 0; y < rows; y++) {
+      a[x * cols + y] = initializer ? initializer(cols, rows, x, y) : 0;
+    }
+  }
+  return a;
+};
+
+const sketch = (p: IP5js) => {
   let oldGrid: number[];
-  let cols = COLS;
-  let rows = ROWS;
+  let cols = size.x;
+  let rows = size.y;
   let color = 80;
   let rand = false;
   let running = true;
@@ -102,41 +131,27 @@ const sketch = (p: any) => {
     // makeGilder(grid, 30,30,3)
   };
 
-  const makeGrid = (
-    cols: number,
-    rows: number,
-    initializer?: (cols: number, rows: number, x: number, y: number) => number
-  ) => {
-    const a: number[] = [];
-    for (let x = 0; x < cols; x++) {
-      for (let y = 0; y < rows; y++) {
-        a[x * cols + y] = initializer ? initializer(cols, rows, x, y) : 0;
-      }
-    }
-    return a;
-  };
-
   const sumNeighbors = (grid: number[], x: number, y: number) => {
     const sum =
       (grid[(x + 1) * cols + y - 1] || 0) +
-      (grid[(x + 1) * COLS + y] || 0) +
-      (grid[(x + 1) * COLS + y + 1] || 0) +
-      (grid[x * COLS + y + 1] || 0) +
-      (grid[(x - 1) * COLS + y + 1] || 0) +
-      (grid[(x - 1) * COLS + y] || 0) +
-      (grid[(x - 1) * COLS + y - 1] || 0) +
-      (grid[x * COLS + y - 1] || 0);
+      (grid[(x + 1) * size.x + y] || 0) +
+      (grid[(x + 1) * size.x + y + 1] || 0) +
+      (grid[x * size.x + y + 1] || 0) +
+      (grid[(x - 1) * size.x + y + 1] || 0) +
+      (grid[(x - 1) * size.x + y] || 0) +
+      (grid[(x - 1) * size.x + y - 1] || 0) +
+      (grid[x * size.x + y - 1] || 0);
     return sum;
   };
 
   const nextGen = (grid: number[], oldGrid: number[]) => {
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
-        if (oldGrid[i * COLS + j] === 3) {
-          grid[i * COLS + j] = 1;
+        if (oldGrid[i * size.x + j] === 3) {
+          grid[i * size.x + j] = 1;
         } else {
-          if (oldGrid[i * COLS + j] !== 2) {
-            grid[i * COLS + j] = 0;
+          if (oldGrid[i * size.x + j] !== 2) {
+            grid[i * size.x + j] = 0;
           }
         }
       }
@@ -156,14 +171,14 @@ const sketch = (p: any) => {
       for (let j = 0; j < rows; j++) {
         let y = j * resolution;
 
-        if (grid[i * COLS + j]) {
+        if (grid[i * size.x + j]) {
           p.fill(rand ? p.floor(p.random(256)) : color, 200, 150);
         } else {
           p.fill(0, 0, 50);
         }
         p.stroke(0);
         p.rect(x, y, resolution - 1, resolution - 1);
-        oldGrid[i * COLS + j] = sumNeighbors(grid, i, j);
+        oldGrid[i * size.x + j] = sumNeighbors(grid, i, j);
       }
     }
     if (running) {
@@ -175,12 +190,25 @@ const sketch = (p: any) => {
     const x = p.floor(p.mouseX / resolution);
     const y = p.floor(p.mouseY / resolution);
     console.log(x, y);
-    if (x >= 0 && y >= 0 && x < COLS && y < ROWS) {
+    if (x >= 0 && y >= 0 && x < size.x && y < size.y) {
       console.log("drawer", grid, x, y, 1);
       drawer(grid, x, y, 2);
       // eraser(grid, x + 3, y + 3, 5);
       // makeGilder(grid, x, y, 1, true);
     }
+  };
+  p.windowResized = () => {
+    console.log("WAAAAA");
+    const X = Math.floor(window.innerWidth / resolution) - 1;
+    const Y = Math.floor(window.innerHeight / resolution) - 5;
+    console.log(size);
+    cols = X;
+    rows = Y;
+    p.resizeCanvas(resolution * cols, resolution * rows);
+    grid = makeGrid(cols, rows, (() => p.floor(p.random(2))));
+    oldGrid = makeGrid(cols, rows);
+    size.x = X;
+    size.y = Y;
   };
 };
 
