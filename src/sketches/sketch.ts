@@ -5,6 +5,7 @@ interface ISketchProps {
   color: number;
   random: boolean;
   running: boolean;
+  speed: number;
 }
 
 type IP5js = {
@@ -87,7 +88,7 @@ const paintBlock = (grid: number[], x: number, y: number) => {
 };
 
 const clearBlock = (grid: number[], x: number, y: number) => {
-  grid[x * size.x + y] = 1;
+  grid[x * size.x + y] = 0;
 };
 
 export const clear = () => {
@@ -117,6 +118,7 @@ const sketch = (p: IP5js) => {
   let color = 80;
   let rand = false;
   let running = true;
+  let speed = 10; // Default speed value
 
   p.setup = () => {
     p.createCanvas(resolution * cols, resolution * rows);
@@ -125,7 +127,7 @@ const sketch = (p: IP5js) => {
     // rows = p.height / resolution
     grid = makeGrid(cols, rows, () => p.floor(p.random(2)));
     oldGrid = makeGrid(cols, rows);
-    // p.frameRate(5)
+    p.frameRate(speed); // Set initial frame rate
 
     // drawer(grid, 10,10,16)
     // makeGilder(grid, 30,30,3)
@@ -162,6 +164,11 @@ const sketch = (p: IP5js) => {
     color = props.color;
     rand = props.random;
     running = props.running;
+    
+    if (speed !== props.speed) {
+      speed = props.speed;
+      p.frameRate(speed);
+    }
   };
 
   p.draw = () => {

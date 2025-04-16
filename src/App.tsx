@@ -6,6 +6,7 @@ function App() {
   const [color, setColor] = useState(80);
   const [random, setRandom] = useState(false);
   const [running, setRunning] = useState(true);
+  const [speed, setSpeed] = useState(10); // Default speed value (frames per second)
 
   return (
     <div className="bg-indigo-300 h-screen">
@@ -46,12 +47,34 @@ function App() {
           </button>
         </div>
       </nav>
+      
+      {/* Speed Control */}
+      <div className="flex items-center justify-center bg-indigo-500 p-2">
+        <div className="text-indigo-100 mr-2">Speed:</div>
+        <button
+          className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-1 border-2 rounded-l"
+          onClick={() => setSpeed(Math.max(1, speed - 5))}
+        >
+          Slower
+        </button>
+        <div className="bg-indigo-400 text-indigo-900 px-3 py-1 border-t-2 border-b-2 border-indigo-800">
+          {speed} fps
+        </div>
+        <button
+          className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-1 border-2 rounded-r border-l-0"
+          onClick={() => setSpeed(Math.min(60, speed + 5))}
+        >
+          Faster
+        </button>
+      </div>
+      
       <section className="w-full flex justify-center align-middle">
         <P5Wrapper
           sketch={sketch}
           color={color}
           random={random}
           running={running}
+          speed={speed}
         />
       </section>
     </div>
