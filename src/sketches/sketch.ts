@@ -1,16 +1,12 @@
-import p5 from "p5";
+import { Sketch, SketchProps } from "@p5-wrapper/react";
 
-interface ISketchProps {
+type ISketchProps = SketchProps & {
   sketch: any;
   color: number;
   random: boolean;
   running: boolean;
   speed: number;
 }
-
-type IP5js = {
-  myCustomRedrawAccordingToNewPropsHandler: (props: ISketchProps) => void;
-} & p5;
 
 let resolution = 20;
 let grid: number[];
@@ -111,7 +107,7 @@ const makeGrid = (
   return a;
 };
 
-const sketch = (p: IP5js) => {
+const sketch: Sketch<ISketchProps> = (p5) => {
   let oldGrid: number[];
   let cols = size.x;
   let rows = size.y;
@@ -120,14 +116,14 @@ const sketch = (p: IP5js) => {
   let running = true;
   let speed = 10; // Default speed value
 
-  p.setup = () => {
-    p.createCanvas(resolution * cols, resolution * rows);
-    p.colorMode(p.HSB);
+  p5.setup = () => {
+    p5.createCanvas(resolution * cols, resolution * rows);
+    p5.colorMode(p5.HSB);
     // cols = p.width / resolution
     // rows = p.height / resolution
-    grid = makeGrid(cols, rows, () => p.floor(p.random(2)));
+    grid = makeGrid(cols, rows, () => p5.floor(p5.random(2)));
     oldGrid = makeGrid(cols, rows);
-    p.frameRate(speed); // Set initial frame rate
+    p5.frameRate(speed); // Set initial frame rate
 
     // drawer(grid, 10,10,16)
     // makeGilder(grid, 30,30,3)
@@ -160,31 +156,36 @@ const sketch = (p: IP5js) => {
     }
   };
 
-  p.myCustomRedrawAccordingToNewPropsHandler = (props: ISketchProps) => {
+  p5.updateWithProps = (props: ISketchProps) => {
     color = props.color;
     rand = props.random;
     running = props.running;
-    
+
+    console.log(speed);
+    console.log(props.speed);
+    console.log(typeof speed);
+    console.log(typeof props.speed);
+
     if (speed !== props.speed) {
       speed = props.speed;
-      p.frameRate(speed);
+      p5.frameRate(speed);
     }
   };
 
-  p.draw = () => {
-    p.background(0);
+  p5.draw = () => {
+    p5.background(0);
     for (let i = 0; i < cols; i++) {
       let x = i * resolution;
       for (let j = 0; j < rows; j++) {
         let y = j * resolution;
 
         if (grid[i * size.x + j]) {
-          p.fill(rand ? p.floor(p.random(256)) : color, 200, 150);
+          p5.fill(rand ? p5.floor(p5.random(256)) : color, 200, 150);
         } else {
-          p.fill(0, 0, 50);
+          p5.fill(0, 0, 50);
         }
-        p.stroke(0);
-        p.rect(x, y, resolution - 1, resolution - 1);
+        p5.stroke(0);
+        p5.rect(x, y, resolution - 1, resolution - 1);
         oldGrid[i * size.x + j] = sumNeighbors(grid, i, j);
       }
     }
@@ -193,9 +194,9 @@ const sketch = (p: IP5js) => {
     }
   };
 
-  p.mouseReleased = () => {
-    const x = p.floor(p.mouseX / resolution);
-    const y = p.floor(p.mouseY / resolution);
+  p5.mouseReleased = () => {
+    const x = p5.floor(p5.mouseX / resolution);
+    const y = p5.floor(p5.mouseY / resolution);
     console.log(x, y);
     if (x >= 0 && y >= 0 && x < size.x && y < size.y) {
       console.log("drawer", grid, x, y, 1);
@@ -204,15 +205,15 @@ const sketch = (p: IP5js) => {
       // makeGilder(grid, x, y, 1, true);
     }
   };
-  p.windowResized = () => {
+  p5.windowResized = () => {
     console.log("WAAAAA");
     const X = Math.floor(window.innerWidth / resolution) - 1;
     const Y = Math.floor(window.innerHeight / resolution) - 5;
     console.log(size);
     cols = X;
     rows = Y;
-    p.resizeCanvas(resolution * cols, resolution * rows);
-    grid = makeGrid(cols, rows, (() => p.floor(p.random(2))));
+    p5.resizeCanvas(resolution * cols, resolution * rows);
+    grid = makeGrid(cols, rows, (() => p5.floor(p5.random(2))));
     oldGrid = makeGrid(cols, rows);
     size.x = X;
     size.y = Y;

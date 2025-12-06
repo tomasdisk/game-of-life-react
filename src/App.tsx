@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import P5Wrapper from "react-p5-wrapper";
+import { ReactP5Wrapper } from "@p5-wrapper/react";
 import sketch, { clear } from "./sketches/sketch";
 
 function App() {
@@ -47,7 +47,7 @@ function App() {
           </button>
         </div>
       </nav>
-      
+
       {/* Speed Control */}
       <div className="flex items-center justify-center bg-indigo-500 p-2">
         <div className="text-indigo-100 mr-2">Speed:</div>
@@ -67,9 +67,9 @@ function App() {
           Faster
         </button>
       </div>
-      
+
       <section className="w-full flex justify-center align-middle">
-        <P5Wrapper
+        <ReactP5Wrapper
           sketch={sketch}
           color={color}
           random={random}

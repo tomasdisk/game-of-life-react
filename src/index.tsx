@@ -1,14 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './output.css';
+import ReactDOM from 'react-dom/client';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error("Root container missing in index.html");
+}
+
+const root = ReactDOM.createRoot(container);
+
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
