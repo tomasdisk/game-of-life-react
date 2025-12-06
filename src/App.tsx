@@ -11,7 +11,7 @@ function App() {
   return (
     <div className="bg-indigo-300 h-screen">
       <nav className="flex items-center justify-between bg-indigo-600 p-3">
-        <div className="inline-flex">
+        <div className="flex">
           <button
             // className="m-1 p-3 rounded-md bg-yellow-500"
             className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-2 border-2 rounded-l"
@@ -46,27 +46,29 @@ function App() {
             {running ? "Stop" : "Play"}
           </button>
         </div>
+
+        {/* Speed Control */}
+        <div className="flex items-center justify-center">
+          <div className="text-indigo-100 mr-2">Speed:</div>
+          <button
+            className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-1 border-2 rounded-l"
+            onClick={() => setSpeed(Math.max(1, speed - 5))}
+          >
+            Slower
+          </button>
+          <div className="bg-indigo-400 text-indigo-900 px-3 py-1 border-t-2 border-b-2 border-indigo-800">
+            {speed} fps
+          </div>
+          <button
+            className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-1 border-2 rounded-r border-l-0"
+            onClick={() => setSpeed(Math.min(60, speed % 5 === 0 ? speed + 5 : 5))}
+          >
+            Faster
+          </button>
+        </div>
       </nav>
 
-      {/* Speed Control */}
-      <div className="flex items-center justify-center bg-indigo-500 p-2">
-        <div className="text-indigo-100 mr-2">Speed:</div>
-        <button
-          className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-1 border-2 rounded-l"
-          onClick={() => setSpeed(Math.max(1, speed - 5))}
-        >
-          Slower
-        </button>
-        <div className="bg-indigo-400 text-indigo-900 px-3 py-1 border-t-2 border-b-2 border-indigo-800">
-          {speed} fps
-        </div>
-        <button
-          className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-1 border-2 rounded-r border-l-0"
-          onClick={() => setSpeed(Math.min(60, speed + 5))}
-        >
-          Faster
-        </button>
-      </div>
+
 
       <section className="w-full flex justify-center align-middle">
         <ReactP5Wrapper

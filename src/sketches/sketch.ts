@@ -14,13 +14,11 @@ const size = {
   x: Math.floor(window.innerWidth / resolution) - 1,
   y: Math.floor(window.innerHeight / resolution) - 5,
 };
-console.log(size);
+
 
 // window.addEventListener("resize", () => {
-//   console.log("wa")
 //   size.x = Math.floor(window.innerWidth / resolution) - 1;
 //   size.y = Math.floor(window.innerHeight / resolution) - 5;
-
 // });
 
 const eraser = (grid: number[], x: number, y: number, h = 1) => {
@@ -161,11 +159,6 @@ const sketch: Sketch<ISketchProps> = (p5) => {
     rand = props.random;
     running = props.running;
 
-    console.log(speed);
-    console.log(props.speed);
-    console.log(typeof speed);
-    console.log(typeof props.speed);
-
     if (speed !== props.speed) {
       speed = props.speed;
       p5.frameRate(speed);
@@ -197,19 +190,17 @@ const sketch: Sketch<ISketchProps> = (p5) => {
   p5.mouseReleased = () => {
     const x = p5.floor(p5.mouseX / resolution);
     const y = p5.floor(p5.mouseY / resolution);
-    console.log(x, y);
+
     if (x >= 0 && y >= 0 && x < size.x && y < size.y) {
-      console.log("drawer", grid, x, y, 1);
       drawer(grid, x, y, 2);
       // eraser(grid, x + 3, y + 3, 5);
       // makeGilder(grid, x, y, 1, true);
     }
   };
   p5.windowResized = () => {
-    console.log("WAAAAA");
     const X = Math.floor(window.innerWidth / resolution) - 1;
     const Y = Math.floor(window.innerHeight / resolution) - 5;
-    console.log(size);
+
     cols = X;
     rows = Y;
     p5.resizeCanvas(resolution * cols, resolution * rows);
