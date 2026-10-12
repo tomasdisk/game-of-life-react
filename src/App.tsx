@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
-import sketch, { clear } from "./sketches/sketch";
+import sketch, { clear, gridSize } from "./sketches/sketch";
 
 function App() {
   const [color, setColor] = useState(80);
   const [random, setRandom] = useState(false);
   const [running, setRunning] = useState(true);
+  const [glider, setGlider] = useState(false);
+  const [size, setSize] = useState(gridSize);
+
+  useEffect(() => {
+    const onResize = () => setSize(gridSize());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const [speed, setSpeed] = useState(10); // Default speed value (frames per second)
 
   return (
@@ -37,6 +45,12 @@ function App() {
             onClick={() => clear()}
           >
             Clear
+          </button>
+          <button
+            className="bg-indigo-600 border-indigo-800 hover:border-yellow-500 text-indigo-200 hover:text-indigo-100 p-2 border-2 border-l-0"
+            onClick={() => setGlider((old) => !old)}
+          >
+            {glider ? "Glider: On" : "Glider: Off"}
           </button>
           <button
             // className="m-1 p-3 rounded-md bg-yellow-500"
@@ -76,9 +90,14 @@ function App() {
           color={color}
           random={random}
           running={running}
+          glider={glider}
           speed={speed}
         />
       </section>
+
+      <footer className="text-center text-sm text-indigo-900 p-1">
+        Grid: {size.x} x {size.y} cells
+      </footer>
     </div>
   );
 }

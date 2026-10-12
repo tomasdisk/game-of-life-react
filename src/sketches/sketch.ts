@@ -6,20 +6,27 @@ type ISketchProps = SketchProps & {
   random: boolean;
   running: boolean;
   speed: number;
+  glider: boolean;
 }
 
 let resolution = 20;
 let grid: number[];
-const size = {
+export const gridSize = () => ({
   x: Math.floor(window.innerWidth / resolution) - 1,
   y: Math.floor(window.innerHeight / resolution) - 5,
-};
+});
+const size = gridSize();
 
 
 // window.addEventListener("resize", () => {
 //   size.x = Math.floor(window.innerWidth / resolution) - 1;
 //   size.y = Math.floor(window.innerHeight / resolution) - 5;
 // });
+
+const index = (x: number, y: number) => x * size.y + y;
+
+const inBounds = (x: number, y: number) =>
+  x >= 0 && y >= 0 && x < size.x && y < size.y;
 
 const eraser = (grid: number[], x: number, y: number, h = 1) => {
   for (let i = x; i < x + h; i++) {
@@ -66,23 +73,29 @@ const makeGilder = (
     xx = x + 2;
     yy = y + 2;
   }
-  grid[(xx + 1) * size.x * xDir + yy] = 1;
-  grid[(xx + 2) * size.x * xDir + yy + 1 * yDir] = 1;
-  grid[xx * size.x + yy + 2 * yDir] = 1;
-  grid[(xx + 1) * size.x * xDir + yy + 2 * yDir] = 1;
-  grid[(xx + 2) * size.x * xDir + yy + 2 * yDir] = 1;
+  paintBlock(grid, xx + 1 * xDir, yy);
+  paintBlock(grid, xx + 2 * xDir, yy + 1 * yDir);
+  paintBlock(grid, xx, yy + 2 * yDir);
+  paintBlock(grid, xx + 1 * xDir, yy + 2 * yDir);
+  paintBlock(grid, xx + 2 * xDir, yy + 2 * yDir);
 };
 
 const toggleBlock = (grid: number[], x: number, y: number) => {
-  grid[x * size.x + y] = grid[x * size.x + y] === 0 ? 1 : 0;
+  if (inBounds(x, y)) {
+    grid[index(x, y)] = grid[index(x, y)] === 0 ? 1 : 0;
+  }
 };
 
 const paintBlock = (grid: number[], x: number, y: number) => {
-  grid[x * size.x + y] = 1;
+  if (inBounds(x, y)) {
+    grid[index(x, y)] = 1;
+  }
 };
 
 const clearBlock = (grid: number[], x: number, y: number) => {
-  grid[x * size.x + y] = 0;
+  if (inBounds(x, y)) {
+    grid[index(x, y)] = 0;
+  }
 };
 
 export const clear = () => {
@@ -99,7 +112,7 @@ const makeGrid = (
   const a: number[] = [];
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) {
-      a[x * cols + y] = initializer ? initializer(cols, rows, x, y) : 0;
+      a[x * rows + y] =initializer ? initializer(cols, rows, x, y) : 0;
     }
   }
   return a;
@@ -113,6 +126,7 @@ const sketch: Sketch<ISketchProps> = (p5) => {
   let rand = false;
   let running = true;
   let speed = 10; // Default speed value
+  let glider = false;
 
   p5.setup = () => {
     p5.createCanvas(resolution * cols, resolution * rows);
@@ -128,26 +142,28 @@ const sketch: Sketch<ISketchProps> = (p5) => {
   };
 
   const sumNeighbors = (grid: number[], x: number, y: number) => {
+    const cell = (x: number, y: number) =>
+      inBounds(x, y) ? grid[index(x, y)] : 0;
     const sum =
-      (grid[(x + 1) * cols + y - 1] || 0) +
-      (grid[(x + 1) * size.x + y] || 0) +
-      (grid[(x + 1) * size.x + y + 1] || 0) +
-      (grid[x * size.x + y + 1] || 0) +
-      (grid[(x - 1) * size.x + y + 1] || 0) +
-      (grid[(x - 1) * size.x + y] || 0) +
-      (grid[(x - 1) * size.x + y - 1] || 0) +
-      (grid[x * size.x + y - 1] || 0);
+      cell(x + 1, y - 1) +
+      cell(x + 1, y) +
+      cell(x + 1, y + 1) +
+      cell(x, y + 1) +
+      cell(x - 1, y + 1) +
+      cell(x - 1, y) +
+      cell(x - 1, y - 1) +
+      cell(x, y - 1);
     return sum;
   };
 
   const nextGen = (grid: number[], oldGrid: number[]) => {
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
-        if (oldGrid[i * size.x + j] === 3) {
-          grid[i * size.x + j] = 1;
+        if (oldGrid[index(i, j)] === 3) {
+          grid[index(i, j)] = 1;
         } else {
-          if (oldGrid[i * size.x + j] !== 2) {
-            grid[i * size.x + j] = 0;
+          if (oldGrid[index(i, j)] !== 2) {
+            grid[index(i, j)] = 0;
           }
         }
       }
@@ -158,6 +174,7 @@ const sketch: Sketch<ISketchProps> = (p5) => {
     color = props.color;
     rand = props.random;
     running = props.running;
+    glider = props.glider;
 
     if (speed !== props.speed) {
       speed = props.speed;
@@ -172,14 +189,14 @@ const sketch: Sketch<ISketchProps> = (p5) => {
       for (let j = 0; j < rows; j++) {
         let y = j * resolution;
 
-        if (grid[i * size.x + j]) {
+        if (grid[index(i, j)]) {
           p5.fill(rand ? p5.floor(p5.random(256)) : color, 200, 150);
         } else {
           p5.fill(0, 0, 50);
         }
         p5.stroke(0);
         p5.rect(x, y, resolution - 1, resolution - 1);
-        oldGrid[i * size.x + j] = sumNeighbors(grid, i, j);
+        oldGrid[index(i, j)] = sumNeighbors(grid, i, j);
       }
     }
     if (running) {
@@ -192,14 +209,17 @@ const sketch: Sketch<ISketchProps> = (p5) => {
     const y = p5.floor(p5.mouseY / resolution);
 
     if (x >= 0 && y >= 0 && x < size.x && y < size.y) {
-      drawer(grid, x, y, 2);
+      if (glider) {
+        // centered on the click, heading in a random diagonal
+        makeGilder(grid, x - 1, y - 1, p5.floor(p5.random(4)), true);
+      } else {
+        drawer(grid, x, y, 2);
+      }
       // eraser(grid, x + 3, y + 3, 5);
-      // makeGilder(grid, x, y, 1, true);
     }
   };
   p5.windowResized = () => {
-    const X = Math.floor(window.innerWidth / resolution) - 1;
-    const Y = Math.floor(window.innerHeight / resolution) - 5;
+    const { x: X, y: Y } = gridSize();
 
     cols = X;
     rows = Y;
