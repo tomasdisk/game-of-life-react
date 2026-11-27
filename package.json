@@ -2,7 +2,7 @@
   "name": "game-of-life-react",
   "description": "Game of life implemented in P5.js wrapped on React.js app",
   "author": "tomasdisk",
-  "homepage": "https://tomasdisk.github.io/game-of-life-react",
+  "homepage": "https://life.disk.ar",
   "version": "1.0.0",
   "dependencies": {
     "@p5-wrapper/react": "^4.4.2",

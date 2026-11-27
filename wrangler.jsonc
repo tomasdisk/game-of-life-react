@@ -1,0 +1,11 @@
+{
+  "name": "game-of-life-react",
+  "compatibility_date": "2026-11-01",
+  // Sitio estático: Cloudflare sirve el build de Create React App sin Worker propio.
+  "assets": {
+    "directory": "./build",
+    "not_found_handling": "single-page-application"
+  },
+  // Necesario para que Workers Builds genere los previews de cada PR.
+  "previews": {}
+}
