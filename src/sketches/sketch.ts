@@ -80,6 +80,7 @@ const makeGilder = (
   paintBlock(grid, xx + 2 * xDir, yy + 2 * yDir);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const toggleBlock = (grid: number[], x: number, y: number) => {
   if (inBounds(x, y)) {
     grid[index(x, y)] = grid[index(x, y)] === 0 ? 1 : 0;
