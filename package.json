@@ -4,6 +4,7 @@
   "author": "tomasdisk",
   "homepage": ".",
   "version": "1.0.0",
+  "packageManager": "yarn@1.22.22",
   "dependencies": {
     "@p5-wrapper/react": "^4.4.2",
     "@tailwindcss/cli": "^4.1.17",
